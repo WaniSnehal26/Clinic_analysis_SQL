@@ -1,0 +1,195 @@
+1) total patients
+
+select count(distinct(patient_id)) as total_patients from hospitaler;
+output- 9216
+
+2) average waiting time
+
+select avg(patient_waittime) as average_waiting_time from hospitaler;
+output - 32.2 mins
+
+3) non referral patients
+
+select count(department_referral) as non_referral_patients from 
+hospitaler
+where department_referral = 'none' ;
+output - 5400
+
+4) average satisfaction score
+
+select avg(patient_sat_score) as average_satisfaction_score from 
+hospitaler;
+output - 1.3633
+
+5) average satisfaction score above 5
+
+select count(patient_sat_score) as average_satisfaction_score_above_5 
+from hospitaler
+where patient_sat_score > 5 ;
+output - 1148
+
+6) average satisfaction score less than or equal to 5
+
+select count(patient_sat_score) as avg_sat_score_lessthanorequalto_5 from 
+hospitaler
+where patient_sat_score <= 5 ;
+output - 8068
+
+7) changing datatype of date column from text to datetime 
+
+alter table hospitaler
+modify column date datetime;
+
+8) alter table by adding 3 columns (year, month, hour) & update value 
+extracted from date column 
+
+alter table hospitaler
+add column year_col int,
+add column month_col int,
+add column time_col int;
+
+update hospitaler
+set 
+    year_col = year(date),
+    month_col = month(date),
+    time_col = hour(date);
+
+9) getting patient count in each year(2019 & 2020)
+
+select year_col as years , count(patient_id) as patients_count
+from hospitaler
+group by year_col;
+
+10) getting monthly patient count in 2019
+
+select year_col, month_col as months, count(patient_id) as patients_count
+from hospitaler
+where year_col = 2019
+group by month_col
+order by month_col;
+
+note- for 2020 just replace 2019 with 2020.
+
+11) patient count on the basis of gender 
+
+select patient_gender as gender, count(patient_id) as patient_count
+from hospitaler
+group by patient_gender;
+
+12) changed datatype to varchar to create group of age column
+
+alter table hospitaler
+modify column patient_age varchar(10);
+
+13) groups created
+
+update hospitaler
+set patient_age = 
+    case 
+        when patient_age >= 0 and patient_age <= 10 then '0-10'
+        when patient_age >= 11 and patient_age <= 20 then '11-20'
+        when patient_age >= 21 and patient_age <= 30 then '21-30'
+        when patient_age >= 31 and patient_age <= 40 then '31-40'
+        when patient_age >= 41 and patient_age <= 50 then '41-50'
+        when patient_age >= 51 and patient_age <= 60 then '51-60'
+        else '60+'
+    end;
+    
+14) age group wise patient count
+
+select patient_age as age_group, count(patient_id) as patient_count from 
+hospitaler
+group by patient_age;
+
+
+15) concating name columns to get full name of patients
+
+alter table hospitaler
+add column full_name varchar(10);
+
+update hospitaler
+set full_name = concat(patient_first_inital, ' ' , patient_last_name);
+
+16) patient count race wise 
+
+select patient_race as race, count(patient_id) as patient_count
+from hospitaler
+group by patient_race
+order by patient_count desc;
+
+17) changed the waiting time column's datatype to create group of time
+
+alter table hospitaler
+modify column patient_waittime varchar(10);
+
+
+18) groups for waiting time 
+
+update hospitaler
+set patient_waittime = case 
+                           when patient_waittime >= 10 and 
+patient_waittime <= 30 then '10-30 mins'
+                           when patient_waittime >= 31 and 
+patient_waittime <= 50 then '31-50 mins'
+                           else '50+ mins'
+                       end;
+
+19) getting count waiting time wise 
+
+select patient_waittime as waiting_time , count(patient_id) as 
+patients_count from hospitaler
+group by patient_waittime
+order by patients_count desc;
+
+20) updating none with no refferal for better understanding
+
+update hospitaler
+set department_referral = case 
+                            when department_referral = 'none' then 'no 
+refferal'
+                            else department_referral
+                          end;
+
+
+21) refferal wise patient count
+
+
+select department_referral as refferral, count(patient_id) as counts
+from hospitaler
+group by refferral
+order by counts desc;
+
+
+22) updating time column(replacing 0 with 24 for better understanging)
+
+update hospitaler
+set time_col = case 
+                    when time_col = 0 then 24
+                    else time_col
+               end;
+
+23)  altering table for time column
+
+alter table hospitaler
+modify column time_col varchar(10);
+
+
+24) creating time slots to check patients visit timing
+
+update hospitaler 
+set time_col = case 
+                   when time_col >= 1 and time_col <= 5 then '1-5'
+                   when time_col >= 6 and time_col <= 10 then '6-10'
+                   when time_col >= 11 and time_col <= 15 then '11-15'
+                   when time_col >= 16 and time_col <= 20 then '16-20'
+                   when time_col >= 21 and time_col <= 24 then '21-24'
+               end;
+
+25) checking patients count in each time slot 
+
+select time_col as time_slot , count(patient_id) as patient_count 
+from hospitaler
+group by time_slot 
+order by patient_count desc;
+
+
